@@ -1,0 +1,39 @@
+<h1>
+    Web Socket Example
+</h1>
+<p>
+    <input type="text" id='chat_value'/>
+	<button id='chat_conection'>Click Me</button>
+</p>
+<div id='message_container'></div>
+<div id='image'></div>
+<script>
+    var ws = new WebSocket('ws://localhost:40510');
+     var name=prompt('What is your name please ??');
+    
+	ws.onopen = function () {
+	     ws.send(JSON.stringify({type:'name',data:name}));
+    }
+
+	log=document.getElementById('message_container');
+	    ws.onmessage = function (ev) {
+				
+				if (evt.data instanceof ArrayBuffer) {
+				var length = evt.data.byteLength;
+				var bytes = new Uint8Array(evt.data);
+				var image = document.getElementById("image");
+				var img = new Image();
+				img.src = 'data:image/png;base64,'+ window.btoa(bytes);
+				var ctx = image.getContext("2d");
+				ctx.drawImage(img, 0, 0);
+			}
+			 var json=JSON.parse(ev.data);
+			log.innerHTML+=json.type+": "+json.data+"<br>";
+    }
+	   document.getElementById('chat_conection').addEventListener('click',function(){
+	   obj=document.getElementById('chat_value');
+		ws.send(JSON.stringify({type:'message',data:obj.value}));
+		document.getElementById('message_container').innerHTML +="You: "+obj.value+"<br>";
+		document.getElementById('chat_value').value="";
+   })
+</script>
